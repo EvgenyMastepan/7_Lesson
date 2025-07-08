@@ -10,8 +10,8 @@ import UIKit
 final class CardDetailView: UIView {
     private let containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .cardBackground
-        view.layer.cornerRadius = 16
+        view.backgroundColor = UIColor(red: 0.15, green: 0.15, blue: 0.15, alpha: 1)
+        view.layer.cornerRadius = 20
         view.layer.masksToBounds = true
         return view
     }()
@@ -34,12 +34,22 @@ final class CardDetailView: UIView {
     
     private let translateLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 20, weight: .regular)
-        label.textColor = .pinyinWhite
+        label.font = UIFont.systemFont(ofSize: 26, weight: .semibold)
+        label.textColor = UIColor(red: 0.4, green: 0.8, blue: 1.0, alpha: 1.0)
         label.textAlignment = .center
         label.numberOfLines = 0
         return label
     }()
+    
+    private let numberLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        label.textColor = UIColor.white.withAlphaComponent(0.6)
+        label.textAlignment = .right
+        return label
+    }()
+    
+    private let strokeAnimationView = StrokeAnimationView()
     
     init(item: ChinaItem) {
         super.init(frame: .zero)
@@ -52,45 +62,56 @@ final class CardDetailView: UIView {
     }
     
     private func setupViews() {
-            backgroundColor = UIColor.black.withAlphaComponent(0.8)
+        backgroundColor = UIColor.black.withAlphaComponent(0.8)
+        
+        let contentStack = UIStackView(arrangedSubviews: [hanziLabel, pinyinLabel, translateLabel])
+        contentStack.axis = .vertical
+        contentStack.spacing = 20
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        containerView.addSubview(numberLabel)
+        containerView.addSubview(contentStack)
+        containerView.addSubview(strokeAnimationView)
+        addSubview(containerView)
+        
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        numberLabel.translatesAutoresizingMaskIntoConstraints = false
+        strokeAnimationView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            containerView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            containerView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            containerView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.85),
             
-            let stackView = UIStackView(arrangedSubviews: [hanziLabel, pinyinLabel, translateLabel])
-            stackView.axis = .vertical
-            stackView.spacing = 16
-            stackView.translatesAutoresizingMaskIntoConstraints = false
+            numberLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
+            numberLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
             
-            containerView.addSubview(stackView)
-            addSubview(containerView)
+            hanziLabel.heightAnchor.constraint(equalToConstant: 80),
             
-            containerView.translatesAutoresizingMaskIntoConstraints = false
+            contentStack.topAnchor.constraint(equalTo: numberLabel.bottomAnchor, constant: 8),
+            contentStack.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 24),
+            contentStack.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -24),
+            contentStack.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -24),
             
-            NSLayoutConstraint.activate([
-                containerView.centerXAnchor.constraint(equalTo: centerXAnchor),
-                containerView.centerYAnchor.constraint(equalTo: centerYAnchor),
-                containerView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.85),
-                
-                stackView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 24),
-                stackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-                stackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-                stackView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -24)
-            ])
-        }
+            strokeAnimationView.centerXAnchor.constraint(equalTo: hanziLabel.centerXAnchor),
+            strokeAnimationView.centerYAnchor.constraint(equalTo: hanziLabel.centerYAnchor),
+            strokeAnimationView.widthAnchor.constraint(equalTo: hanziLabel.widthAnchor),
+            strokeAnimationView.heightAnchor.constraint(equalTo: hanziLabel.heightAnchor)
+        ])
+    }
     
     func configure(with item: ChinaItem) {
+        numberLabel.text = "#\(item.number)"
         hanziLabel.text = item.hanzi
         pinyinLabel.text = item.pinin
-        translateLabel.text = "\(item.number). \(item.translate)"
+        translateLabel.text = item.translate
         
-        // Адаптируем размер шрифта под количество иероглифов
-        let hanziCount = item.hanzi.count
-        let baseSize: CGFloat = 60
-        
-        if hanziCount <= 2 {
-            hanziLabel.font = UIFont.systemFont(ofSize: baseSize, weight: .bold)
-        } else if hanziCount <= 4 {
-            hanziLabel.font = UIFont.systemFont(ofSize: baseSize * 0.8, weight: .bold)
-        } else {
-            hanziLabel.font = UIFont.systemFont(ofSize: baseSize * 0.6, weight: .bold)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.strokeAnimationView.animate(strokeOrder: item.strokeOrder)
         }
+    }
+    
+    func stopAnimation() {
+        strokeAnimationView.reset()
     }
 }

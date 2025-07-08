@@ -56,12 +56,11 @@ final class CardsViewController: UIViewController {
         pageControl.numberOfPages = viewModel.numberOfPages
         pageControl.addTarget(self, action: #selector(pageControlChanged), for: .valueChanged)
     }
-    
+
     @objc private func pageControlChanged(_ sender: UIPageControl) {
         let page = sender.currentPage
         let xOffset = collectionView.frame.width * CGFloat(page)
         collectionView.setContentOffset(CGPoint(x: xOffset, y: 0), animated: true)
-    
     }
     
     private func setupCollectionView() {
@@ -84,6 +83,9 @@ final class CardsViewController: UIViewController {
     }
     
     @objc private func dismissDetail(_ sender: UITapGestureRecognizer) {
+        if let detailView = sender.view as? CardDetailView {
+            detailView.stopAnimation()
+        }
         UIView.animate(withDuration: 0.3, animations: {
             sender.view?.alpha = 0
         }, completion: { _ in
@@ -147,7 +149,7 @@ extension CardsViewController: UIScrollViewDelegate {
     
     private func updateCurrentPage() {
         let pageWidth = collectionView.frame.width
-        let currentPage = Int(collectionView.contentOffset.x / pageWidth)
+        let currentPage = Int(round(collectionView.contentOffset.x / pageWidth))
         pageControl.currentPage = currentPage
     }
 }
