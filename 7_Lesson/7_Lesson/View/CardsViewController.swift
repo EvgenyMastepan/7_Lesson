@@ -11,13 +11,16 @@ final class CardsViewController: UIViewController {
     private let viewModel = CardsViewModel()
     
     private lazy var collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
+        let layout = PagingCollectionViewLayout() // Используем наш кастомный layout
         layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 0
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.isPagingEnabled = true
         cv.showsHorizontalScrollIndicator = false
         cv.backgroundColor = .darkBackground
         cv.register(CardCell.self, forCellWithReuseIdentifier: CardCell.reuseID)
+        cv.decelerationRate = .fast // Для четкого пейджинга
         return cv
     }()
     
@@ -32,6 +35,7 @@ final class CardsViewController: UIViewController {
         super.viewDidLoad()
         setupViews()
         setupCollectionView()
+        collectionView.decelerationRate = .normal
     }
     
     private func setupViews() {
@@ -83,9 +87,6 @@ final class CardsViewController: UIViewController {
     }
     
     @objc private func dismissDetail(_ sender: UITapGestureRecognizer) {
-        if let detailView = sender.view as? CardDetailView {
-            detailView.stopAnimation()
-        }
         UIView.animate(withDuration: 0.3, animations: {
             sender.view?.alpha = 0
         }, completion: { _ in
@@ -114,14 +115,28 @@ extension CardsViewController: UICollectionViewDataSource {
 extension CardsViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let padding: CGFloat = 8
-        let collectionViewWidth = collectionView.frame.width - (padding * 2)
-        let width = (collectionViewWidth - padding * 2) / CGFloat(viewModel.columnsPerPage)
-        let height = (collectionView.frame.height - padding * 5) / 4 // 4 ряда
-        return CGSize(width: width, height: height)
+        let availableWidth = collectionView.bounds.width - (padding * 4) // Отступы слева+справа и между колонками
+        let widthPerItem = availableWidth / 3
+        
+        let availableHeight = collectionView.bounds.height - (padding * 5) // Отступы сверху+снизу и между рядами
+        let heightPerItem = availableHeight / 4
+        
+        return CGSize(width: widthPerItem, height: heightPerItem)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+        let itemsCount = viewModel.itemsForPage(section).count
+        let emptySlots = 12 - itemsCount // 12 - полная страница
+        
+        guard emptySlots > 0 else {
+            return UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+        }
+        
+        // Центрируем неполную страницу
+        let emptySpace = CGFloat(emptySlots / 3) * (collectionView.bounds.width / 3)
+        let leftInset = emptySpace / 2 + 8
+        
+        return UIEdgeInsets(top: 8, left: leftInset, bottom: 8, right: leftInset)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {

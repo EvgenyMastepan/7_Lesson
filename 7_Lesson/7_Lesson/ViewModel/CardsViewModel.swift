@@ -22,12 +22,14 @@ class CardsViewModel {
     }
     
     var numberOfPages: Int {
-        Int(ceil(Double(items.count) / Double(itemsPerPage)))
+        let fullPages = items.count / 12
+        let hasPartialPage = items.count % 12 != 0
+        return fullPages + (hasPartialPage ? 1 : 0)
     }
     
     func itemsForPage(_ page: Int) -> [ChinaItem] {
-        let startIndex = page * itemsPerPage
-        let endIndex = min(startIndex + itemsPerPage, items.count)
+        let startIndex = page * 12
+        let endIndex = min(startIndex + 12, items.count)
         return Array(items[startIndex..<endIndex])
     }
     
