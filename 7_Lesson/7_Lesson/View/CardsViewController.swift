@@ -9,7 +9,7 @@ import UIKit
 
 final class CardsViewController: UIViewController {
     private let viewModel = CardsViewModel()
-    
+  
     private lazy var collectionView: UICollectionView = {
         let layout = PagingCollectionViewLayout() // Используем наш кастомный layout
         layout.scrollDirection = .horizontal
@@ -63,6 +63,7 @@ final class CardsViewController: UIViewController {
 
     @objc private func pageControlChanged(_ sender: UIPageControl) {
         let page = sender.currentPage
+        //Вычисляем по ширине страницы
         let xOffset = collectionView.frame.width * CGFloat(page)
         collectionView.setContentOffset(CGPoint(x: xOffset, y: 0), animated: true)
     }
@@ -132,7 +133,7 @@ extension CardsViewController: UICollectionViewDelegateFlowLayout {
             return UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         }
         
-        // Центрируем неполную страницу
+        // Пытаемся отцентровать неполную страницу
         let emptySpace = CGFloat(emptySlots / 3) * (collectionView.bounds.width / 3)
         let leftInset = emptySpace / 2 + 8
         
@@ -162,6 +163,7 @@ extension CardsViewController: UIScrollViewDelegate {
         updateCurrentPage()
     }
     
+    //Обновлятушки - перепрятушки
     private func updateCurrentPage() {
         let pageWidth = collectionView.frame.width
         let currentPage = Int(round(collectionView.contentOffset.x / pageWidth))

@@ -8,6 +8,7 @@
 
 import UIKit
 
+// Лайаут для коллекции. Оно и без него работало, что характерно. Но пусть будет.
 class PagingCollectionViewLayout: UICollectionViewFlowLayout {
     override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
         guard let collectionView = collectionView else {

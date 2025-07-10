@@ -8,46 +8,36 @@
 import UIKit
 
 final class CardDetailView: UIView {
-    private let containerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(red: 0.15, green: 0.15, blue: 0.15, alpha: 1)
-        view.layer.cornerRadius = 20
-        view.layer.masksToBounds = true
-        return view
-    }()
     
-    private let hanziLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 60, weight: .bold)
-        label.textColor = .hanziRed
-        label.textAlignment = .center
-        return label
-    }()
+    //MARK: -- Вёрстка всплывающего окна с переводом, при нажатии на карточку.
     
-    private let pinyinLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 24, weight: .medium)
-        label.textColor = .pinyinWhite
-        label.textAlignment = .center
-        return label
-    }()
+    private lazy var containerView: UIView = {
+        $0.backgroundColor = .cellBackground
+        $0.layer.cornerRadius = 20
+        $0.layer.masksToBounds = true
+        return $0
+    }(UIView())
     
-    private let translateLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 26, weight: .semibold)
-        label.textColor = UIColor(red: 0.4, green: 0.8, blue: 1.0, alpha: 1.0)
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        return label
-    }()
+    private lazy var hanziLabel = ChinaLabel(
+        font: UIFont.systemFont(ofSize: 60, weight: .bold),
+        textColor: .hanziRed,
+    )
+
+    private lazy var pinyinLabel = ChinaLabel(
+        font: UIFont.systemFont(ofSize: 24, weight: .medium),
+        textColor: .pinyinWhite,
+    )
     
-    private let numberLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-        label.textColor = UIColor.white.withAlphaComponent(0.6)
-        label.textAlignment = .right
-        return label
-    }()
+    private lazy var translateLabel = ChinaLabel(
+        font: UIFont.systemFont(ofSize: 26, weight: .semibold),
+        textColor: .translateColor,
+    )
+    
+    private lazy var numberLabel = ChinaLabel(
+        font: UIFont.systemFont(ofSize: 12, weight: .regular),
+        textColor: UIColor.white.withAlphaComponent(0.6),
+        textAligment: .right
+    )
     
     private let strokeAnimationView = StrokeAnimationView()
     
@@ -69,13 +59,10 @@ final class CardDetailView: UIView {
         contentStack.spacing = 20
         contentStack.translatesAutoresizingMaskIntoConstraints = false
         
-        containerView.addSubview(numberLabel)
-        containerView.addSubview(contentStack)
-        containerView.addSubview(strokeAnimationView)
+        containerView.addSubviews(numberLabel, contentStack, strokeAnimationView)
         addSubview(containerView)
         
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        numberLabel.translatesAutoresizingMaskIntoConstraints = false
         strokeAnimationView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -101,11 +88,13 @@ final class CardDetailView: UIView {
     }
     
     func configure(with item: ChinaItem) {
+        //Передаем данные карточки.
         numberLabel.text = "#\(item.number)"
         hanziLabel.text = item.hanzi
         pinyinLabel.text = item.pinin
         translateLabel.text = item.translate
         
+        // Без этого глючила анимация.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.strokeAnimationView.animate(strokeOrder: item.strokeOrder)
         }

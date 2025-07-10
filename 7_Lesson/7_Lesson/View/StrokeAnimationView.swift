@@ -8,6 +8,9 @@
 import UIKit
 
 class StrokeAnimationView: UIView {
+    
+    //MARK: --  ОПять экспериментальная дичь с анимацией.
+    
     private var strokeLayers: [CAShapeLayer] = []
     private var currentStroke = 0
     private var animationTimer: Timer?
@@ -84,7 +87,7 @@ class StrokeAnimationView: UIView {
         layer.add(animation, forKey: "stroke")
         CATransaction.commit()
     }
-    
+    // Обновляем
     func reset() {
         strokeLayers.forEach { $0.removeFromSuperlayer() }
         strokeLayers.removeAll()

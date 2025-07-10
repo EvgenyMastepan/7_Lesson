@@ -8,6 +8,7 @@
 import Foundation
 
 class CardsViewModel {
+    // Меняем видимость переменных
     private(set) var items: [ChinaItem] = []
     private(set) var itemsPerPage = 12
     private(set) var columnsPerPage = 3
@@ -17,16 +18,20 @@ class CardsViewModel {
         loadItems()
     }
     
+    //Получаем данные
     private func loadItems() {
         items = ChinaItem.getData()
     }
     
+    //Высчитываем кол-во страниц при заданных 12 карточках на страницу.
+    // По большой идее кол-во карточек/стр можно вынести в настройки.
     var numberOfPages: Int {
         let fullPages = items.count / 12
         let hasPartialPage = items.count % 12 != 0
         return fullPages + (hasPartialPage ? 1 : 0)
     }
     
+    //Нужно для расчета карточек для последней страницы
     func itemsForPage(_ page: Int) -> [ChinaItem] {
         let startIndex = page * 12
         let endIndex = min(startIndex + 12, items.count)

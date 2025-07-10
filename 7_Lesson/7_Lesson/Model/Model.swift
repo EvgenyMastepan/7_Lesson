@@ -105,9 +105,10 @@ struct ChinaItem: Identifiable {
             
             ChinaItem(number: "30", hanzi: "粥", translate: "каша", pinin: "zhōu",
                     strokeOrder: ["M30,30 L50,50", "M50,50 L70,30", "M40,60 L60,60"]),
-            
-            ChinaItem(number: "31", hanzi: "爱", translate: "любовь", pinin: "ài",
-                    strokeOrder: ["M50,20 L30,50", "M30,50 L50,80", "M50,80 L70,50", "M70,50 L50,20"]),
+
+            // Проверка на разное кол-во карточек.
+//            ChinaItem(number: "31", hanzi: "爱", translate: "любовь", pinin: "ài",
+//                    strokeOrder: ["M50,20 L30,50", "M30,50 L50,80", "M50,80 L70,50", "M70,50 L50,20"]),
             
             ChinaItem(number: "32", hanzi: "和平", translate: "мир", pinin: "hépíng",
                     strokeOrder: ["M20,50 L80,50", "M50,20 L50,80", "M30,30 L70,70", "M70,30 L30,70"])
